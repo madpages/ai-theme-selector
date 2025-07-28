@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atelier Demo - Theme Lab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS Variables Design System */
+    :root {
+      /* Core Ink / Cream / Neutral */
+      --ink-50: #F1F1F4; --ink-100: #E4E6EA; --ink-200: #C9CCD5; --ink-300: #AEB2C0; --ink-400: #9499AB;
+      --ink-500: #798096; --ink-600: #676E88; --ink-700: #444C68; --ink-800: #4C5573; --ink-900: #394056;
+      --cream-25: #F9F3EC; --cream-50: #F6EDE2; --cream-100: #F3E7D9; --cream-200: #EFE2D3; --cream-300: #E4D4C1; --cream-400: #D4BEA8;
+      --neutral-50: #FAF9F8; --neutral-100: #F4F2F1; --neutral-200: #EDEAE8; --neutral-300: #E8E4E0; --neutral-400: #DBD5D0; --neutral-500: #C5C0BB; --neutral-600: #AFAAA6;
+
+      /* Semantic mappings (LIGHT) */
+      --bg: var(--cream-50); --surface: var(--cream-100); --text: var(--ink-900); --text-muted: var(--ink-600);
+      --primary: var(--ink-800); --primary-contrast: #FFFFFF; --accent-fill: var(--cream-400);
+      --border: var(--neutral-300); --ring: var(--ink-300);
+    }
+
+    /* Dark theme */
+    [data-theme="dark"] {
+      --bg: #181A20; --surface: #1F2230; --text: #F6F7FA; --text-muted: #C1C6D4;
+      --primary: #AEB6D4; --primary-contrast: #1B1F2A; --accent-fill: #2A2F44;
+      --border: #2B3143; --ring: #3B4562;
+    }
+
+    /* Base styles */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: 'Spectral', serif; font-size: 18px; line-height: 1.65;
+      background-color: var(--page-bg, var(--bg)); color: var(--body-text, var(--text)); 
+      transition: background-color 120ms ease, color 120ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+    /* Typography */
+    h1 { 
+      font-size: clamp(2.8rem, 6vw, 4rem); font-weight: 700; line-height: 1.1; margin: 0 0 1rem 0; 
+      color: var(--h1-color, var(--text));
+    }
+    h2 { 
+      font-size: 2rem; font-weight: 500; margin: 4rem 0 1rem 0; 
+      color: var(--h2-color, var(--text));
+    }
+    h3 { 
+      font-size: 1.5rem; font-weight: 500; margin: 2rem 0 1rem 0; 
+      color: var(--h3-color, var(--text));
+    }
+    p { margin: 0 0 1rem 0; max-width: 70ch; color: var(--body-text, var(--text)); }
+    a { color: var(--link-color, var(--primary)); text-decoration: underline; transition: color 120ms ease; }
+    a:hover { opacity: 0.8; }
+    a:focus { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+    /* Layout */
+    .site-header {
+      position: sticky; top: 0; background-color: var(--header-bg, var(--bg)); 
+      border-bottom: 1px solid var(--header-border, var(--border));
+      padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 100;
+    }
+    .logo { 
+      font-size: 1.2rem; font-weight: 700; color: var(--logo-color, var(--text)); text-decoration: none; 
+    }
+    .top-nav { display: flex; gap: 1rem; align-items: center; }
+    .top-nav button {
+      background: var(--button-bg, var(--surface)); border: 1px solid var(--border); 
+      color: var(--button-text, var(--text));
+      padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; font-family: inherit;
+      font-size: 0.9rem; transition: background-color 120ms ease;
+    }
+    .top-nav button:hover { background-color: var(--accent-fill); }
+    .top-nav button:focus { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+    #content { max-width: 800px; margin: 0 auto; padding: 2rem; }
+    .post-header { margin-bottom: 2rem; }
+    .post-sub { color: var(--muted-text, var(--text-muted)); font-size: 1rem; margin-top: 0.5rem; }
+
+    figure { margin: 2rem 0; }
+    figure img { width: 100%; height: 300px; object-fit: cover; border-radius: 4px; background-color: var(--surface); }
+    figcaption { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; font-style: italic; }
+
+    blockquote { border-left: 4px solid var(--primary); padding-left: 2rem; margin: 2rem 0; font-style: italic; color: var(--text-muted); }
+    code { background-color: var(--surface); padding: 0.2rem 0.4rem; border-radius: 2px; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; }
+    pre { background-color: var(--surface); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0; }
+    pre code { background: none; padding: 0; }
+
+    .btn-primary {
+      background-color: var(--primary); color: var(--primary-contrast); border: none;
+      padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; font-family: inherit;
+      font-weight: 500; transition: opacity 120ms ease;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:focus { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+    .site-footer { 
+      text-align: center; padding: 2rem; 
+      background-color: var(--footer-bg, var(--surface));
+      color: var(--footer-text, var(--text-muted)); 
+      border-top: 1px solid var(--border); margin-top: 4rem; 
+    }
+
+    /* Panels */
+    .panel {
+      position: fixed; top: 0; right: 0; height: 100vh; width: 420px; background-color: var(--surface);
+      border-left: 1px solid var(--border); z-index: 200; transform: translateX(100%);
+      transition: transform 200ms ease; overflow-y: auto;
+    }
+    .panel.open { transform: translateX(0); }
+    .panel-header {
+      padding: 1rem; border-bottom: 1px solid var(--border); display: flex;
+      justify-content: space-between; align-items: center; font-weight: 500;
+    }
+    .panel-content { padding: 1rem; }
+    .close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 0.25rem; }
+    .close-btn:hover { color: var(--text); }
+
+    .form-group { margin-bottom: 0.75rem; }
+    .form-group label { display: block; margin-bottom: 0.25rem; font-size: 0.85rem; font-weight: 500; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px;
+      background-color: var(--bg); color: var(--text); font-family: inherit; font-size: 0.9rem;
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    
+    .image-preview-container { position: relative; display: inline-block; }
+    .image-delete-btn {
+      position: absolute; top: 0.25rem; right: 0.25rem;
+      background: rgba(0,0,0,0.7); color: white; border: none;
+      width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+    }
+    .image-delete-btn:hover { background: rgba(255,0,0,0.8); }
+
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: 4px; padding: 1rem;
+      text-align: center; color: var(--text-muted); transition: all 120ms ease;
+      margin-top: 0.5rem; cursor: pointer;
+    }
+    .drop-zone.drag-over { border-color: var(--primary); background-color: var(--accent-fill); }
+    .drop-zone:hover { border-color: var(--primary); }
+
+    .overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.3);
+      z-index: 150; opacity: 0; transition: opacity 200ms ease; pointer-events: none;
+    }
+    .overlay.show { opacity: 1; pointer-events: auto; }
+    .hidden { display: none !important; }
+
+    /* Theme History Styles */
+    .theme-item {
+      border: 1px solid var(--border); border-radius: 4px; padding: 1rem; margin-bottom: 1rem;
+      cursor: pointer; transition: background-color 120ms ease;
+    }
+    .theme-item:hover { background-color: var(--accent-fill); }
+    .theme-item.active { border-color: var(--primary); background-color: var(--accent-fill); }
+    .theme-name { font-weight: 500; margin-bottom: 0.25rem; }
+    .theme-description { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .theme-meta { color: var(--text-muted); font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
+    .theme-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .theme-actions button {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 0.25rem 0.5rem; border-radius: 2px; cursor: pointer; font-size: 0.8rem;
+    }
+    .theme-actions button:hover { background-color: var(--accent-fill); }
+
+    /* Chat Panel Styles */
+    .config-section { background-color: var(--accent-fill); padding: 0.75rem; border-radius: 4px; margin-bottom: 0.75rem; }
+    .config-section.collapsed .config-content { display: none; }
+    .config-toggle { 
+      width: 100%; background: none; border: none; text-align: left; cursor: pointer; 
+      display: flex; justify-content: space-between; align-items: center; padding: 0; margin-bottom: 0.25rem;
+    }
+    .config-toggle h4 { margin: 0; font-size: 0.85rem; }
+    .config-toggle::after { content: '▼'; transition: transform 120ms ease; font-size: 0.8rem; }
+    .config-section.collapsed .config-toggle::after { transform: rotate(-90deg); }
+    .config-content p { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+    .chat-actions { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .chat-actions button {
+      flex: 1; padding: 0.6rem; border: 1px solid var(--border); border-radius: 4px;
+      background-color: var(--surface); color: var(--text); cursor: pointer; font-size: 0.85rem;
+    }
+    .chat-actions button:hover { background-color: var(--accent-fill); }
+    .chat-actions button.primary { background-color: var(--primary); color: var(--primary-contrast); border-color: var(--primary); }
+
+    .response-section { background-color: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.75rem; margin-top: 0.75rem; }
+    .response-section h4 { margin: 0 0 0.5rem 0; font-size: 0.85rem; }
+    .response-content { font-family: 'Monaco', 'Courier New', monospace; font-size: 0.75rem; white-space: pre-wrap; color: var(--text-muted); }
+
+    .error { color: #d32f2f; background-color: #ffebee; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; font-size: 0.9rem; }
+    .success { color: #388e3c; background-color: #e8f5e8; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; font-size: 0.9rem; }
+    
+    /* Loading & Floating Widget */
+    .loading-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+      background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center;
+      z-index: 300; border-radius: inherit;
+    }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top: 2px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    .floating-widget {
+      position: fixed; bottom: 1rem; left: 1rem; z-index: 250;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; max-width: 280px;
+    }
+    .floating-widget.show { display: block; }
+    .widget-theme-selector { position: relative; margin-bottom: 0.5rem; }
+    .widget-theme-name { 
+      font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.25rem 0; border-radius: 4px; transition: background-color 120ms ease;
+    }
+    .widget-theme-name:hover { background-color: var(--accent-fill); }
+    .theme-dropdown-arrow { font-size: 0.8rem; transition: transform 120ms ease; }
+    .widget-theme-selector.open .theme-dropdown-arrow { transform: rotate(180deg); }
+    .theme-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.25rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto;
+      display: none; z-index: 400;
+    }
+    .widget-theme-selector.open .theme-dropdown { display: block; }
+    .theme-option {
+      display: flex; align-items: center; padding: 0.5rem; cursor: pointer;
+      border-bottom: 1px solid var(--border); transition: background-color 120ms ease;
+    }
+    .theme-option:last-child { border-bottom: none; }
+    .theme-option:hover { background-color: var(--accent-fill); }
+    .theme-option.active { background-color: var(--primary); color: var(--primary-contrast); }
+    .theme-option-colors { display: flex; gap: 0.2rem; margin-right: 0.5rem; }
+    .theme-option-color { width: 8px; height: 8px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.2); }
+    .theme-option-name { flex: 1; font-size: 0.85rem; }
+    .theme-option-delete { 
+      opacity: 0; padding: 0.25rem; font-size: 0.7rem; color: var(--text-muted);
+      transition: opacity 120ms ease;
+    }
+    .theme-option:hover .theme-option-delete { opacity: 1; }
+    .theme-option-delete:hover { color: #d32f2f; }
+    .widget-palette { display: flex; gap: 0.25rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .color-square {
+      width: 24px; height: 24px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1);
+      cursor: pointer; position: relative; transition: transform 120ms ease;
+    }
+    .color-square:hover { transform: scale(1.1); }
+    .color-tooltip {
+      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+      padding: 0.5rem; margin-bottom: 0.5rem; font-size: 0.8rem; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: none; z-index: 300;
+    }
+    .color-square:hover .color-tooltip { display: block; }
+    .css-preview {
+      position: absolute; bottom: 100%; left: 0; right: 0; margin-bottom: 0.5rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+      padding: 0.75rem; font-family: 'Monaco', monospace; font-size: 0.75rem;
+      max-height: 200px; overflow-y: auto; opacity: 0; transform: translateY(10px);
+      transition: opacity 200ms ease, transform 200ms ease; z-index: 300;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none;
+    }
+    .css-line { display: flex; align-items: center; margin-bottom: 0.25rem; }
+    .css-color-box { width: 12px; height: 12px; border-radius: 2px; margin-right: 0.5rem; border: 1px solid rgba(0,0,0,0.2); }
+    .floating-widget:hover .css-preview { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .widget-actions { display: flex; gap: 0.5rem; }
+    .widget-actions button { 
+      padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; 
+      background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.9rem; flex: 1;
+    }
+    .widget-actions button:hover { background: var(--accent-fill); }
+    .widget-actions button.primary { background: var(--primary); color: var(--primary-contrast); border-color: var(--primary); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="#" class="logo">Atelier Demo</a>
+    <nav class="top-nav">
+      <button id="open-chat">Ask AI</button>
+      <button id="reset-theme" aria-label="Reset theme">Reset</button>
+    </nav>
+  </header>
+
+  <main id="content">
+    <article class="post">
+      <header class="post-header">
+        <h1>The Art of Digital Minimalism</h1>
+        <p class="post-sub">Exploring intentional design in the modern web • Author Name • July 28, 2025</p>
+      </header>
+      
+      <figure>
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-family='sans-serif' font-size='16' fill='%23666'%3EPlaceholder Hero Image%3C/text%3E%3C/svg%3E" alt="Placeholder hero" />
+        <figcaption>Fig. 1 — Subtle caption in muted ink demonstrates visual hierarchy.</figcaption>
+      </figure>
+
+      <p>In our increasingly complex digital landscape, the principles of minimalism offer a refreshing counterpoint to the noise and clutter that pervades much of the contemporary web.</p>
+
+      <h2>The Typography Foundation</h2>
+      <p>Great design begins with thoughtful typography. The choice of <em>Spectral</em> for this demonstration isn't arbitrary.</p>
+
+      <h3>Color as Communication</h3>
+      <ul>
+        <li>Establishing clear information hierarchy through contrast</li>
+        <li>Creating emotional resonance without overwhelming the content</li>
+        <li>Ensuring accessibility across different viewing conditions</li>
+      </ul>
+
+      <blockquote>
+        "The best interface is no interface, but when we must design one, every decision should serve the user's goals rather than the designer's ego."
+      </blockquote>
+
+      <p>This quote encapsulates the challenge facing modern web designers.</p>
+
+      <pre><code>.btn-primary {
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  transition: opacity 120ms ease;
+}</code></pre>
+
+      <p><button class="btn-primary">Example Interactive Element</button></p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    © Your Name — Demo Theme Lab
+  </footer>
+
+
+  <!-- Chat Panel -->
+  <aside id="chat-panel" class="panel hidden">
+    <div class="panel-header">
+      <h3>AI Theme Assistant</h3>
+      <button class="close-btn" aria-label="Close">&times;</button>
+    </div>
+    <div class="panel-content">
+      <div class="config-section" id="config-section">
+        <button class="config-toggle" id="config-toggle">
+          <h4>⚠️ API Configuration</h4>
+        </button>
+        <div class="config-content">
+          <p>For prototyping only. Use a backend proxy for production.</p>
+          <div class="form-group">
+            <label for="api-key">Gemini API Key:</label>
+            <input type="password" id="api-key" placeholder="Paste your API key here">
+          </div>
+          <div class="form-group">
+            <label for="model-select">Model:</label>
+            <select id="model-select">
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Latest)</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="image-upload">Upload inspiration image (optional):</label>
+        <input type="file" id="image-upload" accept="image/*" class="hidden">
+        <div id="drop-zone" class="drop-zone">
+          📎 Click to upload, drag & drop, or paste (Ctrl+V) an image
+        </div>
+        <div id="image-preview" class="hidden" style="margin-top: 0.5rem;">
+          <div class="image-preview-container">
+            <img id="preview-img" style="max-width: 100%; max-height: 160px; border-radius: 4px; border: 1px solid var(--border);">
+            <button id="clear-image" class="image-delete-btn">×</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="theme-request">Describe your theme idea:</label>
+        <textarea id="theme-request" placeholder="e.g., 'Make it cooler and slightly darker, keep high contrast for long reads'"></textarea>
+      </div>
+
+      <div class="chat-actions">
+        <button id="suggest-theme" class="primary">Generate Theme</button>
+      </div>
+
+      <div id="loading-area" style="position: relative;">
+        <div id="response-section" class="response-section hidden">
+          <h4>Generated CSS:</h4>
+          <div id="response-content" class="response-content"></div>
+        </div>
+      </div>
+
+      <div id="error-display"></div>
+    </div>
+  </aside>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay"></div>
+
+  <!-- Floating Widget -->
+  <div id="floating-widget" class="floating-widget">
+    <div class="widget-theme-selector" id="widget-theme-selector">
+      <div class="widget-theme-name" id="widget-theme-name">
+        <span>Theme: Default</span>
+        <span class="theme-dropdown-arrow">▼</span>
+      </div>
+      <div class="theme-dropdown" id="theme-dropdown"></div>
+    </div>
+    <div class="widget-palette" id="widget-palette"></div>
+    <div class="widget-actions">
+      <button id="widget-current">Current</button>
+      <button id="widget-apply" class="primary">Apply</button>
+    </div>
+    <div class="css-preview" id="css-preview"></div>
+  </div>
+
+  <script>
+    // Theme Lab Implementation
+    class ThemeLab {
+      constructor() {
+        this.currentTheme = null;
+        this.previewedTheme = null;
+        this.lastResponse = null;
+        this.themes = this.loadThemes();
+        this.currentId = localStorage.getItem('themeLab.currentId');
+        this.openPanelId = null;
+        this.uploadedImage = null;
+        this.isGenerating = false;
+        this.previewedTheme = null;
+        this.lastGeneratedTheme = null;
+        
+        this.initializeEventListeners();
+        this.restoreCurrentTheme();
+        this.updateFloatingWidget();
+      }
+
+      getDefaultTheme() {
+        return {
+          id: 'default',
+          name: 'Default Theme',
+          description: 'Warm creams with desaturated ink',
+          createdAt: new Date().toISOString(),
+          model: 'default',
+          variables: {
+            '--bg': '#F6EDE2',
+            '--surface': '#F3E7D9',
+            '--text': '#394056',
+            '--text-muted': '#676E88',
+            '--primary': '#4C5573',
+            '--primary-contrast': '#FFFFFF',
+            '--accent-fill': '#D4BEA8',
+            '--border': '#E8E4E0',
+            '--ring': '#AEB2C0'
+          }
+        };
+      }
+
+      generateId() {
+        return 'theme_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      }
+
+      loadThemes() {
+        const stored = localStorage.getItem('themeLab.history');
+        return stored ? JSON.parse(stored) : [];
+      }
+
+      saveThemes() {
+        localStorage.setItem('themeLab.history', JSON.stringify(this.themes));
+      }
+
+      initializeEventListeners() {
+        // Panel controls
+        document.getElementById('open-chat').addEventListener('click', () => this.openPanel('chat-panel'));
+        document.getElementById('reset-theme').addEventListener('click', () => this.resetTheme());
+
+        // Close panel buttons
+        document.querySelectorAll('.close-btn').forEach(btn => {
+          btn.addEventListener('click', () => this.closePanels());
+        });
+
+        // Overlay and ESC key
+        document.getElementById('overlay').addEventListener('click', () => this.closePanels());
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') this.closePanels();
+        });
+
+        // Theme dropdown
+        document.getElementById('widget-theme-name').addEventListener('click', () => this.toggleThemeDropdown());
+        document.addEventListener('click', (e) => this.handleDocumentClick(e));
+
+        // Chat panel events
+        document.getElementById('suggest-theme').addEventListener('click', () => this.suggestTheme());
+
+        // Config toggle
+        document.getElementById('config-toggle').addEventListener('click', () => this.toggleConfig());
+
+        // Image upload handling
+        document.getElementById('image-upload').addEventListener('change', (e) => this.handleImageUpload(e));
+        document.getElementById('clear-image').addEventListener('click', () => this.clearImage());
+        
+        // Drop zone handling
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.addEventListener('click', () => document.getElementById('image-upload').click());
+        dropZone.addEventListener('dragover', (e) => this.handleDragOver(e));
+        dropZone.addEventListener('dragenter', (e) => this.handleDragEnter(e));
+        dropZone.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+        dropZone.addEventListener('drop', (e) => this.handleDrop(e));
+        
+        // Clipboard paste handling
+        document.addEventListener('paste', (e) => this.handlePaste(e));
+        
+        // Enter key handling for textarea
+        document.getElementById('theme-request').addEventListener('keydown', (e) => this.handleTextareaKeydown(e));
+
+        // Widget controls
+        document.getElementById('widget-current').addEventListener('click', () => this.showCurrentTheme());
+        document.getElementById('widget-apply').addEventListener('click', () => this.applyPreviewedTheme());
+
+        // Save API key and auto-fill
+        document.getElementById('api-key').addEventListener('input', (e) => {
+          localStorage.setItem('themeLab.apiKey', e.target.value);
+        });
+
+        // Load saved API key or use provided key
+        const savedKey = localStorage.getItem('themeLab.apiKey') || 'AIzaSyDSHSDXkp3tQW_2H28nl1TimPcC3239rlI';
+        document.getElementById('api-key').value = savedKey;
+        
+        // Start with config collapsed
+        document.getElementById('config-section').classList.add('collapsed');
+      }
+
+      openPanel(panelId) {
+        if (this.openPanelId === panelId) return;
+        
+        // Close current panel if any
+        if (this.openPanelId) {
+          this.closePanel(this.openPanelId);
+        }
+        
+        const panel = document.getElementById(panelId);
+        const overlay = document.getElementById('overlay');
+        
+        panel.classList.remove('hidden');
+        overlay.classList.add('show');
+        
+        requestAnimationFrame(() => {
+          panel.classList.add('open');
+        });
+        
+        this.openPanelId = panelId;
+      }
+
+      closePanel(panelId) {
+        const panel = document.getElementById(panelId);
+        panel.classList.remove('open');
+        
+        setTimeout(() => {
+          panel.classList.add('hidden');
+        }, 200);
+        
+        if (this.openPanelId === panelId) {
+          this.openPanelId = null;
+        }
+      }
+
+      closePanels() {
+        if (!this.openPanelId) return;
+        
+        this.closePanel(this.openPanelId);
+        document.getElementById('overlay').classList.remove('show');
+      }
+
+      renderThemeHistory() {
+        const container = document.getElementById('theme-list');
+        container.innerHTML = '';
+
+        this.themes.forEach(theme => {
+          const item = document.createElement('div');
+          item.className = `theme-item ${theme.id === this.currentId ? 'active' : ''}`;
+          item.innerHTML = `
+            <div class="theme-name">${theme.name}</div>
+            <div class="theme-description">${theme.description}</div>
+            <div class="theme-meta">
+              <span>${new Date(theme.createdAt).toLocaleDateString()}</span>
+              <span>${theme.model}</span>
+            </div>
+            <div class="theme-actions">
+              <button onclick="themeLab.previewTheme('${theme.id}')">Preview</button>
+              <button onclick="themeLab.applyTheme('${theme.id}')">Apply</button>
+              <button onclick="themeLab.duplicateTheme('${theme.id}')">Duplicate</button>
+              <button onclick="themeLab.deleteTheme('${theme.id}')">Delete</button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      previewTheme(themeId) {
+        const theme = this.themes.find(t => t.id === themeId) || this.getDefaultTheme();
+        this.previewedTheme = theme;
+        this.applyVariables(theme.variables);
+        this.updateFloatingWidget();
+      }
+
+      applyTheme(themeId) {
+        const theme = this.themes.find(t => t.id === themeId) || this.getDefaultTheme();
+        this.currentTheme = theme;
+        this.currentId = theme.id;
+        this.previewedTheme = null;
+        
+        localStorage.setItem('themeLab.currentId', theme.id);
+        this.applyVariables(theme.variables);
+        this.updateFloatingWidget();
+        this.showSuccess('Theme applied successfully!');
+      }
+
+      duplicateTheme(themeId) {
+        const theme = this.themes.find(t => t.id === themeId);
+        if (!theme) return;
+
+        const duplicate = {
+          ...theme,
+          id: this.generateId(),
+          name: `${theme.name} (Copy)`,
+          createdAt: new Date().toISOString()
+        };
+
+        this.themes.unshift(duplicate);
+        this.saveThemes();
+        this.renderThemeHistory();
+      }
+
+      deleteTheme(themeId) {
+        if (confirm('Delete this theme?')) {
+          this.themes = this.themes.filter(t => t.id !== themeId);
+          if (this.currentId === themeId) {
+            this.resetTheme();
+          }
+          this.saveThemes();
+          this.renderThemeHistory();
+        }
+      }
+
+      resetTheme() {
+        const defaultTheme = this.getDefaultTheme();
+        this.currentTheme = defaultTheme;
+        this.currentId = 'default';
+        this.previewedTheme = null;
+        
+        localStorage.setItem('themeLab.currentId', 'default');
+        this.applyVariables(defaultTheme.variables);
+        this.renderThemeHistory();
+        this.updateFloatingWidget();
+        this.showSuccess('Theme reset to default');
+      }
+
+      restoreCurrentTheme() {
+        if (this.currentId) {
+          const theme = this.themes.find(t => t.id === this.currentId) || this.getDefaultTheme();
+          this.currentTheme = theme;
+          this.applyVariables(theme.variables);
+        }
+      }
+
+      applyVariables(variables) {
+        const validatedVars = this.validateVariables(variables);
+        if (!validatedVars.isValid) {
+          this.showError(`Invalid variables: ${validatedVars.errors.join(', ')}`);
+          return false;
+        }
+
+        let styleElement = document.getElementById('runtime-theme');
+        if (!styleElement) {
+          styleElement = document.createElement('style');
+          styleElement.id = 'runtime-theme';
+          document.head.appendChild(styleElement);
+        }
+
+        const cssText = ':root {\n' + 
+          Object.entries(variables)
+            .map(([key, value]) => `  ${key}: ${value};`)
+            .join('\n') + 
+          '\n}';
+        
+        styleElement.textContent = cssText;
+        return true;
+      }
+
+      validateVariables(variables) {
+        const allowedVars = [
+          // Original semantic variables
+          '--bg', '--surface', '--text', '--text-muted', '--primary', 
+          '--primary-contrast', '--accent-fill', '--border', '--ring',
+          // New element-specific variables
+          '--page-bg', '--header-bg', '--header-border', '--footer-bg', '--footer-text',
+          '--h1-color', '--h2-color', '--h3-color', '--body-text', '--muted-text',
+          '--button-bg', '--button-text', '--link-color', '--logo-color'
+        ];
+        
+        const errors = [];
+        
+        for (const [key, value] of Object.entries(variables)) {
+          if (!allowedVars.includes(key)) {
+            errors.push(`Unknown variable: ${key}`);
+            continue;
+          }
+          
+          if (!this.isValidHex(value)) {
+            errors.push(`Invalid hex color: ${key} = ${value}`);
+          }
+        }
+
+        return { isValid: errors.length === 0, errors };
+      }
+
+      isValidHex(color) {
+        return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+      }
+
+      async suggestTheme() {
+        const apiKey = document.getElementById('api-key').value;
+        const request = document.getElementById('theme-request').value;
+        const model = document.getElementById('model-select').value;
+
+        if (!apiKey) {
+          this.showError('Please enter your Gemini API key');
+          return;
+        }
+
+        if (!request.trim()) {
+          this.showError('Please describe your theme idea');
+          return;
+        }
+
+        if (this.isGenerating) return;
+
+        try {
+          this.isGenerating = true;
+          this.showLoadingSpinner();
+          this.clearErrors();
+          
+          const currentVars = this.currentTheme ? this.currentTheme.variables : this.getDefaultTheme().variables;
+          const response = await this.callGeminiAPI(apiKey, model, currentVars, request);
+          
+          this.lastGeneratedTheme = response;
+          this.displayResponse(response);
+          
+          // Auto-preview the generated theme
+          this.previewedTheme = response;
+          this.applyVariables(response.variables);
+          
+          // Close panel and update floating widget
+          this.closePanels();
+          this.updateFloatingWidget();
+          
+          this.showSuccess('Theme generated and previewed!');
+          
+        } catch (error) {
+          this.showError(`Error: ${error.message}`);
+        } finally {
+          this.isGenerating = false;
+          this.hideLoadingSpinner();
+        }
+      }
+
+      async callGeminiAPI(apiKey, model, currentVariables, userRequest) {
+        const systemPrompt = `You are a color-systems assistant. Generate CSS variables for a minimalist editorial site theme.
+
+When an image is provided:
+- Extract dominant colors, mood, and aesthetic from the image
+- Use the image's palette to inform the theme
+- Reference image influence in theme name/description
+
+OUTPUT ONLY CSS with these exact variables:
+--page-bg, --header-bg, --header-border, --footer-bg, --footer-text,
+--h1-color, --h2-color, --h3-color, --body-text, --muted-text,
+--button-bg, --button-text, --link-color, --accent-fill, --border, --ring,
+--bg, --surface, --text, --text-muted, --primary, --primary-contrast
+
+Rules:
+- All colors must be HEX (#RRGGBB)
+- Ensure WCAG AA contrast (4.5:1 minimum)
+- Output format: /* Theme: Name | Description */\\n:root { ... }
+- Maximum 6 unique hues in palette
+- Include ISO timestamp in comment`;
+
+        let userMessage = `Current theme: ${JSON.stringify(currentVariables)}
+Request: ${userRequest}
+
+Generate CSS variables only. Ensure accessibility.`;
+
+        if (this.uploadedImage) {
+          userMessage += `\n\nImage uploaded - extract colors and mood for theme inspiration.`;
+        }
+
+        const userParts = [{ text: userMessage }];
+        
+        if (this.uploadedImage) {
+          userParts.push({
+            inline_data: {
+              mime_type: this.uploadedImage.mimeType,
+              data: this.uploadedImage.data
+            }
+          });
+        }
+
+        const requestBody = {
+          system_instruction: {
+            role: "system",
+            parts: [{ text: systemPrompt }]
+          },
+          contents: [{
+            role: "user",
+            parts: userParts
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            responseMimeType: "text/plain"
+          }
+        };
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!content) {
+          throw new Error('No content in API response');
+        }
+
+        return this.parseCSSResponse(content, model);
+      }
+
+      parseCSSResponse(cssText, model) {
+        // Extract theme name and description from comment
+        const commentMatch = cssText.match(/\/\*\s*Theme:\s*([^|]+)\|\s*([^*]+)\*\//);
+        const themeName = commentMatch ? commentMatch[1].trim() : 'Generated Theme';
+        const description = commentMatch ? commentMatch[2].trim() : 'AI-generated theme';
+
+        // Extract CSS variables
+        const variables = {};
+        const cssMatch = cssText.match(/:root\s*\{([^}]+)\}/);
+        
+        if (cssMatch) {
+          const cssVars = cssMatch[1];
+          const varMatches = cssVars.matchAll(/--([^:]+):\s*([^;]+);/g);
+          
+          for (const match of varMatches) {
+            const varName = `--${match[1].trim()}`;
+            const varValue = match[2].trim();
+            variables[varName] = varValue;
+          }
+        }
+
+        return {
+          id: this.generateId(),
+          name: themeName,
+          description: description,
+          createdAt: new Date().toISOString(),
+          model: model,
+          variables: variables,
+          cssText: cssText
+        };
+      }
+
+      previewCurrentResponse() {
+        if (!this.lastResponse) {
+          this.showError('No theme to preview');
+          return;
+        }
+        this.applyVariables(this.lastResponse.variables);
+        this.showSuccess('Theme previewed');
+      }
+
+      applyCurrentResponse() {
+        if (!this.lastResponse) {
+          this.showError('No theme to apply');
+          return;
+        }
+        
+        this.themes.unshift(this.lastResponse);
+        this.saveThemes();
+        this.applyTheme(this.lastResponse.id);
+        this.renderThemeHistory();
+        this.showSuccess('Theme applied and saved!');
+      }
+
+      async handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+          this.showError('Please select a valid image file');
+          return;
+        }
+
+        await this.processImageFile(file);
+      }
+
+      fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64 = reader.result.split(',')[1]; // Remove data:image/...;base64, prefix
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      clearImage() {
+        this.uploadedImage = null;
+        document.getElementById('image-upload').value = '';
+        document.getElementById('image-preview').classList.add('hidden');
+        this.showSuccess('Image removed');
+      }
+
+      handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      }
+
+      handleDragEnter(e) {
+        e.preventDefault();
+        document.getElementById('drop-zone').classList.add('drag-over');
+      }
+
+      handleDragLeave(e) {
+        e.preventDefault();
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          document.getElementById('drop-zone').classList.remove('drag-over');
+        }
+      }
+
+      async handleDrop(e) {
+        e.preventDefault();
+        document.getElementById('drop-zone').classList.remove('drag-over');
+        
+        const files = Array.from(e.dataTransfer.files);
+        const imageFile = files.find(file => file.type.startsWith('image/'));
+        
+        if (imageFile) {
+          await this.processImageFile(imageFile);
+        } else {
+          this.showError('Please drop an image file');
+        }
+      }
+
+      async handlePaste(e) {
+        const items = Array.from(e.clipboardData?.items || []);
+        const imageItem = items.find(item => item.type.startsWith('image/'));
+        
+        if (imageItem) {
+          e.preventDefault();
+          const file = imageItem.getAsFile();
+          if (file) {
+            await this.processImageFile(file);
+          }
+        }
+      }
+
+      async processImageFile(file) {
+        if (file.size > 20 * 1024 * 1024) {
+          this.showError('Image too large. Please select an image under 20MB');
+          return;
+        }
+
+        try {
+          const base64Data = await this.fileToBase64(file);
+          this.uploadedImage = {
+            data: base64Data,
+            mimeType: file.type,
+            fileName: file.name
+          };
+
+          const preview = document.getElementById('image-preview');
+          const previewImg = document.getElementById('preview-img');
+          
+          previewImg.src = `data:${file.type};base64,${base64Data}`;
+          preview.classList.remove('hidden');
+          
+          this.showSuccess(`Image uploaded: ${file.name}`);
+        } catch (error) {
+          this.showError('Failed to process image');
+        }
+      }
+
+      displayResponse(response) {
+        document.getElementById('response-section').classList.remove('hidden');
+        document.getElementById('response-content').textContent = JSON.stringify(response, null, 2);
+      }
+
+      exportAll() {
+        const data = { themes: this.themes, exportedAt: new Date().toISOString() };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'theme-lab-export.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      importThemes(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            const importedThemes = data.themes || [];
+            
+            // Dedupe by ID
+            const existingIds = new Set(this.themes.map(t => t.id));
+            const newThemes = importedThemes.filter(t => !existingIds.has(t.id));
+            
+            this.themes = [...newThemes, ...this.themes];
+            this.saveThemes();
+            this.renderThemeHistory();
+            this.showSuccess(`Imported ${newThemes.length} new themes`);
+          } catch (error) {
+            this.showError('Invalid JSON file');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      clearAll() {
+        if (confirm('Clear all theme history? This cannot be undone.')) {
+          this.themes = [];
+          this.saveThemes();
+          this.renderThemeHistory();
+          this.resetTheme();
+        }
+      }
+
+      showError(message) {
+        const display = document.getElementById('error-display');
+        display.innerHTML = `<div class="error">${message}</div>`;
+        setTimeout(() => display.innerHTML = '', 5000);
+      }
+
+      showSuccess(message) {
+        const display = document.getElementById('error-display');
+        display.innerHTML = `<div class="success">${message}</div>`;
+        setTimeout(() => display.innerHTML = '', 3000);
+      }
+
+      showLoading(message) {
+        const display = document.getElementById('error-display');
+        display.innerHTML = `<div style="color: var(--text-muted);">${message}</div>`;
+      }
+
+      toggleConfig() {
+        const configSection = document.getElementById('config-section');
+        configSection.classList.toggle('collapsed');
+      }
+
+      showCurrentTheme() {
+        if (this.currentTheme) {
+          this.applyVariables(this.currentTheme.variables);
+          this.previewedTheme = null;
+          this.updateFloatingWidget();
+        }
+      }
+
+      applyPreviewedTheme() {
+        if (this.previewedTheme) {
+          this.themes.unshift(this.previewedTheme);
+          this.saveThemes();
+          this.applyTheme(this.previewedTheme.id);
+          this.renderThemeHistory();
+          this.showSuccess('Theme applied and saved!');
+        }
+      }
+
+      updateFloatingWidget() {
+        const widget = document.getElementById('floating-widget');
+        const nameEl = document.getElementById('widget-theme-name').querySelector('span');
+        
+        // Show previewed theme if available, otherwise current theme
+        const displayTheme = this.previewedTheme || this.currentTheme || this.getDefaultTheme();
+        const isPreview = !!this.previewedTheme;
+        
+        nameEl.textContent = `${isPreview ? 'Preview: ' : 'Current: '}${displayTheme.name}`;
+        
+        // Update color palette and CSS preview
+        this.populateColorPalette(displayTheme.variables);
+        this.populateCSSPreview(displayTheme);
+        this.populateThemeDropdown();
+        
+        // Update button states
+        const currentBtn = document.getElementById('widget-current');
+        const applyBtn = document.getElementById('widget-apply');
+        
+        currentBtn.style.display = isPreview ? 'block' : 'none';
+        applyBtn.textContent = isPreview ? 'Apply' : 'Applied';
+        applyBtn.disabled = !isPreview;
+        
+        widget.classList.add('show');
+      }
+
+      toggleThemeDropdown() {
+        const selector = document.getElementById('widget-theme-selector');
+        selector.classList.toggle('open');
+      }
+
+      handleDocumentClick(e) {
+        const selector = document.getElementById('widget-theme-selector');
+        if (!selector.contains(e.target)) {
+          selector.classList.remove('open');
+        }
+      }
+
+      populateThemeDropdown() {
+        const dropdown = document.getElementById('theme-dropdown');
+        const allThemes = [this.getDefaultTheme(), ...this.themes];
+        
+        dropdown.innerHTML = '';
+        
+        allThemes.forEach(theme => {
+          const option = document.createElement('div');
+          option.className = `theme-option ${theme.id === this.currentId ? 'active' : ''}`;
+          
+          // Color squares
+          const colorsDiv = document.createElement('div');
+          colorsDiv.className = 'theme-option-colors';
+          const colors = this.extractUniqueColors(theme.variables);
+          colors.slice(0, 4).forEach(color => {
+            const colorSquare = document.createElement('div');
+            colorSquare.className = 'theme-option-color';
+            colorSquare.style.backgroundColor = color;
+            colorsDiv.appendChild(colorSquare);
+          });
+          
+          // Theme name
+          const nameDiv = document.createElement('div');
+          nameDiv.className = 'theme-option-name';
+          nameDiv.textContent = theme.name;
+          
+          // Delete button (not for default theme)
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'theme-option-delete';
+          deleteBtn.textContent = '×';
+          deleteBtn.style.display = theme.id === 'default' ? 'none' : 'block';
+          deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.deleteThemeFromDropdown(theme.id);
+          });
+          
+          option.appendChild(colorsDiv);
+          option.appendChild(nameDiv);
+          option.appendChild(deleteBtn);
+          
+          option.addEventListener('click', () => {
+            this.selectThemeFromDropdown(theme.id);
+          });
+          
+          dropdown.appendChild(option);
+        });
+      }
+
+      selectThemeFromDropdown(themeId) {
+        this.applyTheme(themeId);
+        document.getElementById('widget-theme-selector').classList.remove('open');
+      }
+
+      deleteThemeFromDropdown(themeId) {
+        if (confirm('Delete this theme?')) {
+          this.themes = this.themes.filter(t => t.id !== themeId);
+          if (this.currentId === themeId) {
+            this.resetTheme();
+          }
+          this.saveThemes();
+          this.updateFloatingWidget();
+        }
+      }
+
+      extractUniqueColors(variables) {
+        const mainVars = ['--primary', '--bg', '--text', '--accent-fill', '--surface', '--header-bg'];
+        const colors = new Set();
+        
+        mainVars.forEach(varName => {
+          const color = variables[varName];
+          if (color && this.isValidHex(color)) {
+            colors.add(color.toLowerCase());
+          }
+        });
+        
+        return Array.from(colors);
+      }
+
+      populateColorPalette(variables) {
+        const paletteEl = document.getElementById('widget-palette');
+        const uniqueColors = this.extractUniqueColors(variables);
+        
+        paletteEl.innerHTML = '';
+        
+        uniqueColors.forEach(color => {
+          const square = document.createElement('div');
+          square.className = 'color-square';
+          square.style.backgroundColor = color;
+          
+          const tooltip = document.createElement('div');
+          tooltip.className = 'color-tooltip';
+          tooltip.textContent = color.toUpperCase();
+          
+          square.appendChild(tooltip);
+          paletteEl.appendChild(square);
+        });
+      }
+
+      populateCSSPreview(theme) {
+        const previewEl = document.getElementById('css-preview');
+        previewEl.innerHTML = '';
+        
+        // Add opening brace
+        const openBrace = document.createElement('div');
+        openBrace.textContent = ':root {';
+        previewEl.appendChild(openBrace);
+        
+        // Add each variable with color box
+        Object.entries(theme.variables).forEach(([key, value]) => {
+          const line = document.createElement('div');
+          line.className = 'css-line';
+          
+          if (this.isValidHex(value)) {
+            const colorBox = document.createElement('div');
+            colorBox.className = 'css-color-box';
+            colorBox.style.backgroundColor = value;
+            line.appendChild(colorBox);
+          } else {
+            // Empty space for non-color values
+            const spacer = document.createElement('div');
+            spacer.style.width = '12px';
+            spacer.style.marginRight = '0.5rem';
+            line.appendChild(spacer);
+          }
+          
+          const text = document.createElement('span');
+          text.textContent = `  ${key}: ${value};`;
+          line.appendChild(text);
+          
+          previewEl.appendChild(line);
+        });
+        
+        // Add closing brace
+        const closeBrace = document.createElement('div');
+        closeBrace.textContent = '}';
+        previewEl.appendChild(closeBrace);
+      }
+
+      showLoadingSpinner() {
+        const loadingArea = document.getElementById('loading-area');
+        const existingOverlay = loadingArea.querySelector('.loading-overlay');
+        
+        if (existingOverlay) return;
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'loading-overlay';
+        overlay.innerHTML = '<div class="spinner"></div>';
+        loadingArea.appendChild(overlay);
+      }
+
+      hideLoadingSpinner() {
+        const overlay = document.querySelector('.loading-overlay');
+        if (overlay) {
+          overlay.remove();
+        }
+      }
+
+      clearErrors() {
+        document.getElementById('error-display').innerHTML = '';
+      }
+
+      handleTextareaKeydown(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          this.suggestTheme();
+        }
+      }
+    }
+
+    // Initialize the Theme Lab
+    let themeLab;
+    document.addEventListener('DOMContentLoaded', () => {
+      themeLab = new ThemeLab();
+    });
+  </script>
+</body>
+</html>
