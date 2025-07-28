@@ -868,8 +868,8 @@
           localStorage.setItem('themeLab.apiKey', e.target.value);
         });
 
-        // Load saved API key or use provided key
-        const savedKey = localStorage.getItem('themeLab.apiKey') || 'AIzaSyDSHSDXkp3tQW_2H28nl1TimPcC3239rlI';
+        // Load saved API key
+        const savedKey = localStorage.getItem('themeLab.apiKey') || '';
         document.getElementById('api-key').value = savedKey;
         
         // Start with config collapsed
