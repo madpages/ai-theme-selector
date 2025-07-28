@@ -61,7 +61,10 @@
       padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 100;
     }
     .logo { 
-      font-size: 1.2rem; font-weight: 700; color: var(--logo-color, var(--text)); text-decoration: none; 
+      color: var(--logo-color, var(--primary)); text-decoration: none; display: flex; align-items: center;
+    }
+    .logo svg { 
+      width: 32px; height: 32px; fill: currentColor;
     }
     .top-nav { display: flex; gap: 1rem; align-items: center; }
     .top-nav button {
@@ -192,18 +195,20 @@
     .success { color: #388e3c; background-color: #e8f5e8; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0; font-size: 0.9rem; }
     
     /* Loading & Floating Widget */
-    .loading-overlay {
+    .panel-loading-overlay {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
-      background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center;
-      z-index: 300; border-radius: inherit;
+      background: rgba(var(--surface-rgb, 255,255,255), 0.95); 
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 400; backdrop-filter: blur(2px);
     }
-    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top: 2px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    .loading-spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem; }
+    .loading-text { font-size: 0.9rem; color: var(--text-muted); text-align: center; max-width: 200px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     
     .floating-widget {
       position: fixed; bottom: 1rem; left: 1rem; z-index: 250;
       background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; max-width: 280px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; width: 280px;
     }
     .floating-widget.show { display: block; }
     .widget-theme-selector { position: relative; margin-bottom: 0.5rem; }
@@ -215,7 +220,7 @@
     .theme-dropdown-arrow { font-size: 0.8rem; transition: transform 120ms ease; }
     .widget-theme-selector.open .theme-dropdown-arrow { transform: rotate(180deg); }
     .theme-dropdown {
-      position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.25rem;
+      position: absolute; bottom: 100%; left: 0; right: 0; margin-bottom: 0.25rem;
       background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 200px; overflow-y: auto;
       display: none; z-index: 400;
@@ -237,7 +242,13 @@
     }
     .theme-option:hover .theme-option-delete { opacity: 1; }
     .theme-option-delete:hover { color: #d32f2f; }
-    .widget-palette { display: flex; gap: 0.25rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .widget-palette-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .widget-palette { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+    .code-icon {
+      width: 20px; height: 20px; cursor: pointer; opacity: 0.6; transition: opacity 120ms ease;
+      border: none; background: none; font-size: 0.8rem; padding: 0;
+    }
+    .code-icon:hover { opacity: 1; }
     .color-square {
       width: 24px; height: 24px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1);
       cursor: pointer; position: relative; transition: transform 120ms ease;
@@ -260,7 +271,19 @@
     }
     .css-line { display: flex; align-items: center; margin-bottom: 0.25rem; }
     .css-color-box { width: 12px; height: 12px; border-radius: 2px; margin-right: 0.5rem; border: 1px solid rgba(0,0,0,0.2); }
-    .floating-widget:hover .css-preview { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .css-popup {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 500;
+      background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center;
+    }
+    .css-popup-content {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 1rem; max-width: 400px; max-height: 60vh; overflow-y: auto;
+      font-family: 'Monaco', monospace; font-size: 0.8rem; position: relative;
+    }
+    .css-popup-close {
+      position: absolute; top: 0.5rem; right: 0.75rem; background: none; border: none;
+      font-size: 1.2rem; cursor: pointer; color: var(--text-muted);
+    }
     .widget-actions { display: flex; gap: 0.5rem; }
     .widget-actions button { 
       padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 4px; 
@@ -272,7 +295,13 @@
 </head>
 <body>
   <header class="site-header">
-    <a href="#" class="logo">Atelier Demo</a>
+    <a href="#" class="logo">
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="8" r="4"/>
+        <path d="M8 16 L24 16 L20 24 L12 24 Z"/>
+        <rect x="14" y="20" width="4" height="8" rx="2"/>
+      </svg>
+    </a>
     <nav class="top-nav">
       <button id="open-chat">Ask AI</button>
       <button id="reset-theme" aria-label="Reset theme">Reset</button>
@@ -326,6 +355,10 @@
 
   <!-- Chat Panel -->
   <aside id="chat-panel" class="panel hidden">
+    <div class="panel-loading-overlay" id="panel-loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text" id="loading-text">Summoning color spirits...</div>
+    </div>
     <div class="panel-header">
       <h3>AI Theme Assistant</h3>
       <button class="close-btn" aria-label="Close">&times;</button>
@@ -389,6 +422,14 @@
   <!-- Overlay -->
   <div id="overlay" class="overlay"></div>
 
+  <!-- CSS Popup -->
+  <div id="css-popup" class="css-popup">
+    <div class="css-popup-content">
+      <button class="css-popup-close" id="css-popup-close">×</button>
+      <div id="css-popup-code"></div>
+    </div>
+  </div>
+
   <!-- Floating Widget -->
   <div id="floating-widget" class="floating-widget">
     <div class="widget-theme-selector" id="widget-theme-selector">
@@ -398,7 +439,11 @@
       </div>
       <div class="theme-dropdown" id="theme-dropdown"></div>
     </div>
-    <div class="widget-palette" id="widget-palette"></div>
+    <div class="widget-palette-row">
+      <div class="widget-palette" id="widget-palette"></div>
+      <button class="code-icon" id="code-icon" title="View CSS">{ }</button>
+      <button class="code-icon" id="link-icon" title="Copy Link">🔗</button>
+    </div>
     <div class="widget-actions">
       <button id="widget-current">Current</button>
       <button id="widget-apply" class="primary">Apply</button>
@@ -407,57 +452,358 @@
   </div>
 
   <script>
+    // Theme Store - unified interface for local + default themes
+    class ThemeStore {
+      constructor() {
+        this.defaultThemes = this.createDefaultThemes();
+        this.localThemes = this.loadLocalThemes();
+        this.deduplicateThemes();
+      }
+
+      createDefaultThemes() {
+        return [
+          {
+            id: 'default',
+            name: 'Default Theme',
+            description: 'Warm creams with desaturated ink',
+            createdAt: '2025-01-01T00:00:00.000Z',
+            model: 'default',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#F6EDE2', '--header-bg': '#F6EDE2', '--header-border': '#E8E4E0',
+              '--footer-bg': '#F3E7D9', '--footer-text': '#676E88', '--h1-color': '#394056',
+              '--h2-color': '#394056', '--h3-color': '#394056', '--body-text': '#394056',
+              '--muted-text': '#676E88', '--logo-color': '#4C5573', '--button-bg': '#F3E7D9',
+              '--button-text': '#394056', '--link-color': '#4C5573', '--accent-fill': '#D4BEA8',
+              '--border': '#E8E4E0', '--ring': '#AEB2C0', '--bg': '#F6EDE2',
+              '--surface': '#F3E7D9', '--text': '#394056', '--text-muted': '#676E88',
+              '--primary': '#4C5573', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'azure-serenity-default',
+            name: 'Azure Serenity',
+            description: 'A calming theme with deep teal accents and a serene, subtly tinted white background, evoking the peacefulness of the ocean.',
+            createdAt: '2025-01-01T01:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#F8FCFC', '--header-bg': '#F8FCFC', '--header-border': '#C7E0E0',
+              '--footer-bg': '#4A7C7C', '--footer-text': '#FFFFFF', '--h1-color': '#2E3A3A',
+              '--h2-color': '#3F4C4C', '--h3-color': '#505E5E', '--body-text': '#4C5C5C',
+              '--muted-text': '#7F8C8C', '--logo-color': '#4A7C7C', '--button-bg': '#4A7C7C',
+              '--button-text': '#FFFFFF', '--link-color': '#4A7C7C', '--accent-fill': '#E0EFEF',
+              '--border': '#B0CACA', '--ring': '#4A7C7C', '--bg': '#F8FCFC',
+              '--surface': '#EFF5F5', '--text': '#4C5C5C', '--text-muted': '#7F8C8C',
+              '--primary': '#4A7C7C', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'emerald-mist-default',
+            name: 'Emerald Mist',
+            description: 'A serene theme featuring deep teal accents and soft, misty greens.',
+            createdAt: '2025-01-01T02:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#F5FCFC', '--header-bg': '#F5FCFC', '--header-border': '#2F3D3D',
+              '--footer-bg': '#F5FCFC', '--footer-text': '#2F3D3D', '--h1-color': '#1A2626',
+              '--h2-color': '#1A2626', '--h3-color': '#1A2626', '--body-text': '#1A2626',
+              '--muted-text': '#2F3D3D', '--logo-color': '#004D40', '--button-bg': '#004D40',
+              '--button-text': '#FFFFFF', '--link-color': '#004D40', '--accent-fill': '#E8F2F2',
+              '--border': '#2F3D3D', '--ring': '#004D40', '--bg': '#F5FCFC',
+              '--surface': '#E8F2F2', '--text': '#1A2626', '--text-muted': '#2F3D3D',
+              '--primary': '#004D40', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'woven-gold-default',
+            name: 'Woven Gold',
+            description: 'A warm, sophisticated theme inspired by natural textures and golden accents.',
+            createdAt: '2025-01-01T03:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#FDFBF7', '--header-bg': '#FDFBF7', '--header-border': '#F5F0E8',
+              '--footer-bg': '#FDFBF7', '--footer-text': '#7F7F7F', '--h1-color': '#2B2B2B',
+              '--h2-color': '#333333', '--h3-color': '#333333', '--body-text': '#4A4A4A',
+              '--muted-text': '#7F7F7F', '--logo-color': '#A67C2C', '--button-bg': '#A67C2C',
+              '--button-text': '#FFFFFF', '--link-color': '#A67C2C', '--accent-fill': '#F5F0E8',
+              '--border': '#D0C8BF', '--ring': '#A67C2C', '--bg': '#FDFBF7',
+              '--surface': '#F5F0E8', '--text': '#4A4A4A', '--text-muted': '#7F7F7F',
+              '--primary': '#A67C2C', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'desert-bloom-default',
+            name: 'Desert Bloom',
+            description: 'A warm, inviting theme with earthy terracotta and muted beige tones, reminiscent of desert landscapes.',
+            createdAt: '2025-01-01T04:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#F8F5F0', '--header-bg': '#F8F5F0', '--header-border': '#E0D8D0',
+              '--footer-bg': '#F8F5F0', '--footer-text': '#8C827A', '--h1-color': '#7A3820',
+              '--h2-color': '#4A423D', '--h3-color': '#4A423D', '--body-text': '#4A423D',
+              '--muted-text': '#8C827A', '--logo-color': '#B0502F', '--button-bg': '#B0502F',
+              '--button-text': '#FFFFFF', '--link-color': '#B0502F', '--accent-fill': '#ECE7E2',
+              '--border': '#E0D8D0', '--ring': '#B0502F', '--bg': '#F8F5F0',
+              '--surface': '#F0EDE8', '--text': '#4A423D', '--text-muted': '#8C827A',
+              '--primary': '#B0502F', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'ember-glow-default',
+            name: 'Ember Glow',
+            description: 'A warm, earthy theme inspired by glowing embers and natural tones.',
+            createdAt: '2025-01-01T05:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#FAF7F5', '--header-bg': '#FAF7F5', '--header-border': '#D5CDC6',
+              '--footer-bg': '#FAF7F5', '--footer-text': '#7D716B', '--h1-color': '#8C3F2B',
+              '--h2-color': '#3A302F', '--h3-color': '#3A302F', '--body-text': '#3A302F',
+              '--muted-text': '#7D716B', '--logo-color': '#D96E4C', '--button-bg': '#D96E4C',
+              '--button-text': '#FFFFFF', '--link-color': '#D96E4C', '--accent-fill': '#EBE6E1',
+              '--border': '#D5CDC6', '--ring': '#D96E4C', '--bg': '#FAF7F5',
+              '--surface': '#F0EBE7', '--text': '#3A302F', '--text-muted': '#7D716B',
+              '--primary': '#D96E4C', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'coastal-whisper-default',
+            name: 'Coastal Whisper',
+            description: 'A light, airy theme with subtle blue-grey tones and a touch of warmth.',
+            createdAt: '2025-01-01T06:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#F8FBFC', '--header-bg': '#E0F0F2', '--header-border': '#5C7B8B',
+              '--footer-bg': '#E0F0F2', '--footer-text': '#2E4057', '--h1-color': '#2E4057',
+              '--h2-color': '#2E4057', '--h3-color': '#2E4057', '--body-text': '#4A6D7C',
+              '--muted-text': '#5C7B8B', '--logo-color': '#2E4057', '--button-bg': '#4A6D7C',
+              '--button-text': '#FFFFFF', '--link-color': '#4A6D7C', '--accent-fill': '#D2D6A5',
+              '--border': '#5C7B8B', '--ring': '#D2D6A5', '--bg': '#F8FBFC',
+              '--surface': '#FFFFFF', '--text': '#2E4057', '--text-muted': '#5C7B8B',
+              '--primary': '#4A6D7C', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'duo-leap-default',
+            name: 'Duo Leap',
+            description: 'A vibrant and energetic theme inspired by language learning apps, featuring lively greens and strong contrasts.',
+            createdAt: '2025-01-01T07:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#FFFFFF', '--header-bg': '#FFFFFF', '--header-border': '#E0E0E0',
+              '--footer-bg': '#FFFFFF', '--footer-text': '#757575', '--h1-color': '#1A1A1A',
+              '--h2-color': '#1A1A1A', '--h3-color': '#1A1A1A', '--body-text': '#1A1A1A',
+              '--muted-text': '#757575', '--logo-color': '#7AC70C', '--button-bg': '#7AC70C',
+              '--button-text': '#1A1A1A', '--link-color': '#007BFF', '--accent-fill': '#F0F0F0',
+              '--border': '#D0D0D0', '--ring': '#7AC70C', '--bg': '#FFFFFF',
+              '--surface': '#F5F5F5', '--text': '#1A1A1A', '--text-muted': '#757575',
+              '--primary': '#7AC70C', '--primary-contrast': '#1A1A1A'
+            }
+          },
+          {
+            id: 'journeys-ascent-default',
+            name: 'Journey\'s Ascent',
+            description: 'A vibrant and inviting theme with crisp teal and energetic orange accents on a clean, light background, inspired by adventure and process.',
+            createdAt: '2025-01-01T08:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#FCFCFC', '--header-bg': '#FFFFFF', '--header-border': '#E0E0E0',
+              '--footer-bg': '#FFFFFF', '--footer-text': '#666666', '--h1-color': '#2C575E',
+              '--h2-color': '#2FB5A5', '--h3-color': '#4F9D95', '--body-text': '#333333',
+              '--muted-text': '#666666', '--logo-color': '#2FB5A5', '--button-bg': '#2FB5A5',
+              '--button-text': '#FFFFFF', '--link-color': '#2FB5A5', '--accent-fill': '#F58C36',
+              '--border': '#DDC9B6', '--ring': '#F8AD72', '--bg': '#FCFCFC',
+              '--surface': '#FFFFFF', '--text': '#333333', '--text-muted': '#666666',
+              '--primary': '#2FB5A5', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'serene-butterfly-default',
+            name: 'Serene Butterfly',
+            description: 'A calming theme inspired by soft blues, muted teals, and subtle golden accents, reflecting tranquility and gentle growth.',
+            createdAt: '2025-01-01T09:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#E0F0F2', '--header-bg': '#E0F0F2', '--header-border': '#C8E0E5',
+              '--footer-bg': '#E0F0F2', '--footer-text': '#5C7B8B', '--h1-color': '#2E4057',
+              '--h2-color': '#2E4057', '--h3-color': '#2E4057', '--body-text': '#4A6D7C',
+              '--muted-text': '#5C7B8B', '--logo-color': '#4A6D7C', '--button-bg': '#4A6D7C',
+              '--button-text': '#FFFFFF', '--link-color': '#4A6D7C', '--accent-fill': '#D2D6A5',
+              '--border': '#AEC5CC', '--ring': '#D2D6A5', '--bg': '#E0F0F2',
+              '--surface': '#F8FCFD', '--text': '#2E4057', '--text-muted': '#5C7B8B',
+              '--primary': '#4A6D7C', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'fridas-whimsy-default',
+            name: 'Frida\'s Whimsy',
+            description: 'A clean, artistic theme inspired by playful illustrations and natural tones from the Hotel Frida website.',
+            createdAt: '2025-01-01T10:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#FFFFFF', '--header-bg': '#FFFFFF', '--header-border': '#E5E5E5',
+              '--footer-bg': '#FFFFFF', '--footer-text': '#000000', '--h1-color': '#000000',
+              '--h2-color': '#000000', '--h3-color': '#000000', '--body-text': '#000000',
+              '--muted-text': '#333333', '--logo-color': '#E4A747', '--button-bg': '#E4A747',
+              '--button-text': '#000000', '--link-color': '#5A8B88', '--accent-fill': '#C1DCDC',
+              '--border': '#E5E5E5', '--ring': '#5A8B88', '--bg': '#FFFFFF',
+              '--surface': '#FFFFFF', '--text': '#000000', '--text-muted': '#333333',
+              '--primary': '#E4A747', '--primary-contrast': '#000000'
+            }
+          },
+          {
+            id: 'muted-horizon-default',
+            name: 'Muted Horizon',
+            description: 'A serene and sophisticated theme with warm neutrals and a grounding desaturated blue-green accent, ideal for calm, focused content.',
+            createdAt: '2025-01-01T11:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#F8F6F2', '--header-bg': '#F8F6F2', '--header-border': '#E0E0DB',
+              '--footer-bg': '#F8F6F2', '--footer-text': '#757575', '--h1-color': '#2E2E2E',
+              '--h2-color': '#2E2E2E', '--h3-color': '#2E2E2E', '--body-text': '#2E2E2E',
+              '--muted-text': '#757575', '--logo-color': '#4A6D7C', '--button-bg': '#4A6D7C',
+              '--button-text': '#FFFFFF', '--link-color': '#4A6D7C', '--accent-fill': '#E0E0DB',
+              '--border': '#E0E0DB', '--ring': '#4A6D7C', '--bg': '#F8F6F2',
+              '--surface': '#E0E0DB', '--text': '#2E2E2E', '--text-muted': '#757575',
+              '--primary': '#4A6D7C', '--primary-contrast': '#FFFFFF'
+            }
+          },
+          {
+            id: 'vintage-script-default',
+            name: 'Vintage Script',
+            description: 'A warm, inviting theme with a nostalgic palette of muted jewel tones and soft neutrals, designed for clear, humanist readability.',
+            createdAt: '2025-01-01T12:00:00.000Z',
+            model: 'curated',
+            isDefault: true,
+            variables: {
+              '--page-bg': '#FFFFFF', '--header-bg': '#FFFFFF', '--header-border': '#E0E0E0',
+              '--footer-bg': '#F0F0F0', '--footer-text': '#424242', '--h1-color': '#367C7D',
+              '--h2-color': '#9C6242', '--h3-color': '#745A79', '--body-text': '#424242',
+              '--muted-text': '#757575', '--logo-color': '#367C7D', '--button-bg': '#367C7D',
+              '--button-text': '#FFFFFF', '--link-color': '#367C7D', '--accent-fill': '#D4A28A',
+              '--border': '#E0E0E0', '--ring': '#76A6A6', '--bg': '#FFFFFF',
+              '--surface': '#F8F8F8', '--text': '#424242', '--text-muted': '#757575',
+              '--primary': '#367C7D', '--primary-contrast': '#FFFFFF'
+            }
+          }
+        ];
+      }
+
+      loadLocalThemes() {
+        const stored = localStorage.getItem('themeLab.history');
+        return stored ? JSON.parse(stored) : [];
+      }
+
+      saveLocalThemes() {
+        localStorage.setItem('themeLab.history', JSON.stringify(this.localThemes));
+      }
+
+      deduplicateThemes() {
+        // Remove local themes that match default theme names
+        const defaultNames = new Set(this.defaultThemes.map(t => t.name.toLowerCase()));
+        const uniqueLocal = this.localThemes.filter(theme => 
+          !defaultNames.has(theme.name.toLowerCase())
+        );
+
+        // Remove duplicates within local themes (keep newest)
+        const nameToTheme = new Map();
+        uniqueLocal.forEach(theme => {
+          const key = theme.name.toLowerCase();
+          if (!nameToTheme.has(key) || 
+              new Date(theme.createdAt) > new Date(nameToTheme.get(key).createdAt)) {
+            nameToTheme.set(key, theme);
+          }
+        });
+
+        this.localThemes = Array.from(nameToTheme.values())
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        this.saveLocalThemes();
+      }
+
+      getAllThemes() {
+        return [...this.defaultThemes, ...this.localThemes];
+      }
+
+      getThemeById(id) {
+        return this.getAllThemes().find(t => t.id === id);
+      }
+
+      getThemeNames() {
+        return this.getAllThemes().map(t => t.name);
+      }
+
+      addLocalTheme(theme) {
+        // Ensure unique name
+        const existingNames = new Set(this.getThemeNames().map(n => n.toLowerCase()));
+        let uniqueName = theme.name;
+        let counter = 1;
+        
+        while (existingNames.has(uniqueName.toLowerCase())) {
+          uniqueName = `${theme.name} ${counter}`;
+          counter++;
+        }
+        
+        const newTheme = { ...theme, name: uniqueName, isDefault: false };
+        this.localThemes.unshift(newTheme);
+        this.saveLocalThemes();
+        return newTheme;
+      }
+
+      deleteTheme(id) {
+        const theme = this.getThemeById(id);
+        if (!theme || theme.isDefault) return false;
+        
+        this.localThemes = this.localThemes.filter(t => t.id !== id);
+        this.saveLocalThemes();
+        return true;
+      }
+
+      canDelete(id) {
+        const theme = this.getThemeById(id);
+        return theme && !theme.isDefault;
+      }
+    }
+
     // Theme Lab Implementation
     class ThemeLab {
       constructor() {
+        this.themeStore = new ThemeStore();
         this.currentTheme = null;
         this.previewedTheme = null;
         this.lastResponse = null;
-        this.themes = this.loadThemes();
         this.currentId = localStorage.getItem('themeLab.currentId');
         this.openPanelId = null;
         this.uploadedImage = null;
         this.isGenerating = false;
-        this.previewedTheme = null;
         this.lastGeneratedTheme = null;
         
         this.initializeEventListeners();
+        this.checkURLTheme();
         this.restoreCurrentTheme();
         this.updateFloatingWidget();
       }
 
       getDefaultTheme() {
-        return {
-          id: 'default',
-          name: 'Default Theme',
-          description: 'Warm creams with desaturated ink',
-          createdAt: new Date().toISOString(),
-          model: 'default',
-          variables: {
-            '--bg': '#F6EDE2',
-            '--surface': '#F3E7D9',
-            '--text': '#394056',
-            '--text-muted': '#676E88',
-            '--primary': '#4C5573',
-            '--primary-contrast': '#FFFFFF',
-            '--accent-fill': '#D4BEA8',
-            '--border': '#E8E4E0',
-            '--ring': '#AEB2C0'
-          }
-        };
+        return this.themeStore.getThemeById('default');
       }
 
       generateId() {
         return 'theme_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
       }
 
-      loadThemes() {
-        const stored = localStorage.getItem('themeLab.history');
-        return stored ? JSON.parse(stored) : [];
-      }
-
-      saveThemes() {
-        localStorage.setItem('themeLab.history', JSON.stringify(this.themes));
+      get themes() {
+        return this.themeStore.getAllThemes();
       }
 
       initializeEventListeners() {
@@ -503,10 +849,19 @@
         
         // Enter key handling for textarea
         document.getElementById('theme-request').addEventListener('keydown', (e) => this.handleTextareaKeydown(e));
+        
+        // Hash change detection for shared URLs
+        window.addEventListener('hashchange', () => this.handleHashChange());
 
         // Widget controls
         document.getElementById('widget-current').addEventListener('click', () => this.showCurrentTheme());
         document.getElementById('widget-apply').addEventListener('click', () => this.applyPreviewedTheme());
+        document.getElementById('code-icon').addEventListener('click', () => this.showCSSPopup());
+        document.getElementById('link-icon').addEventListener('click', () => this.copyThemeLink());
+        document.getElementById('css-popup-close').addEventListener('click', () => this.hideCSSPopup());
+        document.getElementById('css-popup').addEventListener('click', (e) => {
+          if (e.target.id === 'css-popup') this.hideCSSPopup();
+        });
 
         // Save API key and auto-fill
         document.getElementById('api-key').addEventListener('input', (e) => {
@@ -569,8 +924,15 @@
         this.themes.forEach(theme => {
           const item = document.createElement('div');
           item.className = `theme-item ${theme.id === this.currentId ? 'active' : ''}`;
+          
+          const deleteButton = this.themeStore.canDelete(theme.id) 
+            ? `<button onclick="themeLab.deleteTheme('${theme.id}')">Delete</button>`
+            : '';
+          
+          const typeLabel = theme.isDefault ? ' <span style="color: var(--text-muted); font-size: 0.8em;">(Built-in)</span>' : '';
+          
           item.innerHTML = `
-            <div class="theme-name">${theme.name}</div>
+            <div class="theme-name">${theme.name}${typeLabel}</div>
             <div class="theme-description">${theme.description}</div>
             <div class="theme-meta">
               <span>${new Date(theme.createdAt).toLocaleDateString()}</span>
@@ -580,7 +942,7 @@
               <button onclick="themeLab.previewTheme('${theme.id}')">Preview</button>
               <button onclick="themeLab.applyTheme('${theme.id}')">Apply</button>
               <button onclick="themeLab.duplicateTheme('${theme.id}')">Duplicate</button>
-              <button onclick="themeLab.deleteTheme('${theme.id}')">Delete</button>
+              ${deleteButton}
             </div>
           `;
           container.appendChild(item);
@@ -588,48 +950,58 @@
       }
 
       previewTheme(themeId) {
-        const theme = this.themes.find(t => t.id === themeId) || this.getDefaultTheme();
+        const theme = this.themeStore.getThemeById(themeId) || this.getDefaultTheme();
         this.previewedTheme = theme;
         this.applyVariables(theme.variables);
+        this.updateURLWithTheme(theme);
         this.updateFloatingWidget();
       }
 
       applyTheme(themeId) {
-        const theme = this.themes.find(t => t.id === themeId) || this.getDefaultTheme();
+        const theme = this.themeStore.getThemeById(themeId) || this.getDefaultTheme();
         this.currentTheme = theme;
         this.currentId = theme.id;
         this.previewedTheme = null;
         
         localStorage.setItem('themeLab.currentId', theme.id);
         this.applyVariables(theme.variables);
+        this.updateURLWithTheme(theme);
         this.updateFloatingWidget();
         this.showSuccess('Theme applied successfully!');
       }
 
       duplicateTheme(themeId) {
-        const theme = this.themes.find(t => t.id === themeId);
+        const theme = this.themeStore.getThemeById(themeId);
         if (!theme) return;
 
         const duplicate = {
           ...theme,
           id: this.generateId(),
           name: `${theme.name} (Copy)`,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          isDefault: false
         };
 
-        this.themes.unshift(duplicate);
-        this.saveThemes();
+        this.themeStore.addLocalTheme(duplicate);
         this.renderThemeHistory();
+        this.showSuccess('Theme duplicated!');
       }
 
       deleteTheme(themeId) {
+        if (!this.themeStore.canDelete(themeId)) {
+          this.showError('Cannot delete built-in themes');
+          return;
+        }
+
         if (confirm('Delete this theme?')) {
-          this.themes = this.themes.filter(t => t.id !== themeId);
-          if (this.currentId === themeId) {
-            this.resetTheme();
+          if (this.themeStore.deleteTheme(themeId)) {
+            if (this.currentId === themeId) {
+              this.resetTheme();
+            }
+            this.renderThemeHistory();
+            this.updateFloatingWidget();
+            this.showSuccess('Theme deleted');
           }
-          this.saveThemes();
-          this.renderThemeHistory();
         }
       }
 
@@ -648,7 +1020,7 @@
 
       restoreCurrentTheme() {
         if (this.currentId) {
-          const theme = this.themes.find(t => t.id === this.currentId) || this.getDefaultTheme();
+          const theme = this.themeStore.getThemeById(this.currentId) || this.getDefaultTheme();
           this.currentTheme = theme;
           this.applyVariables(theme.variables);
         }
@@ -741,6 +1113,9 @@
           this.previewedTheme = response;
           this.applyVariables(response.variables);
           
+          // Update URL with theme data
+          this.updateURLWithTheme(response);
+          
           // Close panel and update floating widget
           this.closePanels();
           this.updateFloatingWidget();
@@ -755,31 +1130,65 @@
         }
       }
 
-      async callGeminiAPI(apiKey, model, currentVariables, userRequest) {
-        const systemPrompt = `You are a color-systems assistant. Generate CSS variables for a minimalist editorial site theme.
+      async callGeminiAPI(apiKey, model, currentVariables, userRequest, retryCount = 0) {
+        const existingThemeNames = this.themeStore.getThemeNames();
+        const nameListText = existingThemeNames.length > 0 
+          ? `\n\nEXISTING THEME NAMES (DO NOT USE): ${existingThemeNames.join(', ')}\n`
+          : '';
 
-When an image is provided:
-- Extract dominant colors, mood, and aesthetic from the image
-- Use the image's palette to inform the theme
-- Reference image influence in theme name/description
+        const systemPrompt = `You are a CSS theme generator. You MUST respond with ONLY CSS code, nothing else.
 
-OUTPUT ONLY CSS with these exact variables:
+CRITICAL REQUIREMENTS:
+1. You MUST include every single variable listed below (ALL 22 variables)
+2. You MUST respond ONLY with CSS in the exact format shown
+3. You MUST create a UNIQUE theme name (different from existing themes)${nameListText}
+
+REQUIRED VARIABLES (include ALL 22 variables):
 --page-bg, --header-bg, --header-border, --footer-bg, --footer-text,
---h1-color, --h2-color, --h3-color, --body-text, --muted-text,
+--h1-color, --h2-color, --h3-color, --body-text, --muted-text, --logo-color,
 --button-bg, --button-text, --link-color, --accent-fill, --border, --ring,
 --bg, --surface, --text, --text-muted, --primary, --primary-contrast
 
-Rules:
-- All colors must be HEX (#RRGGBB)
-- Ensure WCAG AA contrast (4.5:1 minimum)
-- Output format: /* Theme: Name | Description */\\n:root { ... }
-- Maximum 6 unique hues in palette
-- Include ISO timestamp in comment`;
+MANDATORY OUTPUT FORMAT (respond with ONLY this CSS, no other text):
+/* Theme: [UNIQUE_NAME] | [Description] */
+:root {
+  --page-bg: #RRGGBB;
+  --header-bg: #RRGGBB;
+  --header-border: #RRGGBB;
+  --footer-bg: #RRGGBB;
+  --footer-text: #RRGGBB;
+  --h1-color: #RRGGBB;
+  --h2-color: #RRGGBB;
+  --h3-color: #RRGGBB;
+  --body-text: #RRGGBB;
+  --muted-text: #RRGGBB;
+  --logo-color: #RRGGBB;
+  --button-bg: #RRGGBB;
+  --button-text: #RRGGBB;
+  --link-color: #RRGGBB;
+  --accent-fill: #RRGGBB;
+  --border: #RRGGBB;
+  --ring: #RRGGBB;
+  --bg: #RRGGBB;
+  --surface: #RRGGBB;
+  --text: #RRGGBB;
+  --text-muted: #RRGGBB;
+  --primary: #RRGGBB;
+  --primary-contrast: #RRGGBB;
+}
 
-        let userMessage = `Current theme: ${JSON.stringify(currentVariables)}
-Request: ${userRequest}
+RULES:
+- ALL colors must be valid HEX (#RRGGBB format)
+- Ensure WCAG AA contrast (4.5:1 minimum for text)
+- NEVER omit any variable from the list
+- If image provided, extract colors from it
+- Use maximum 6 unique hues across all variables
+- Theme name MUST be unique and different from existing themes`;
 
-Generate CSS variables only. Ensure accessibility.`;
+        let userMessage = `Current theme variables: ${JSON.stringify(currentVariables)}
+User request: ${userRequest}
+
+Respond with ONLY CSS code in the exact format specified. No explanations, no additional text.`;
 
         if (this.uploadedImage) {
           userMessage += `\n\nImage uploaded - extract colors and mood for theme inspiration.`;
@@ -828,28 +1237,63 @@ Generate CSS variables only. Ensure accessibility.`;
           throw new Error('No content in API response');
         }
 
-        return this.parseCSSResponse(content, model);
+        const parsedTheme = this.parseCSSResponse(content, model);
+        
+        // Check for duplicate theme name
+        if (existingThemeNames.includes(parsedTheme.name) && retryCount < 2) {
+          console.warn(`Duplicate theme name detected: ${parsedTheme.name}. Retrying...`);
+          return this.callGeminiAPI(
+            apiKey, 
+            model, 
+            currentVariables, 
+            `${userRequest}\n\nIMPORTANT: The name "${parsedTheme.name}" already exists. Generate a different unique name.`, 
+            retryCount + 1
+          );
+        }
+        
+        return parsedTheme;
       }
 
       parseCSSResponse(cssText, model) {
+        // Clean up CSS text - remove any markdown formatting
+        let cleanedCSS = cssText.replace(/```css\s*/, '').replace(/```\s*$/, '').trim();
+        
         // Extract theme name and description from comment
-        const commentMatch = cssText.match(/\/\*\s*Theme:\s*([^|]+)\|\s*([^*]+)\*\//);
-        const themeName = commentMatch ? commentMatch[1].trim() : 'Generated Theme';
-        const description = commentMatch ? commentMatch[2].trim() : 'AI-generated theme';
+        const commentMatch = cleanedCSS.match(/\/\*\s*Theme:\s*([^|]+?)(?:\s*\|\s*([^*]+?))?\s*\*\//);
+        const themeName = commentMatch ? commentMatch[1].trim() : `Generated Theme ${Date.now()}`;
+        const description = commentMatch && commentMatch[2] ? commentMatch[2].trim() : 'AI-generated theme';
 
-        // Extract CSS variables
+        // Extract CSS variables with improved regex
         const variables = {};
-        const cssMatch = cssText.match(/:root\s*\{([^}]+)\}/);
+        const cssMatch = cleanedCSS.match(/:root\s*\{([^}]+)\}/s);
         
         if (cssMatch) {
           const cssVars = cssMatch[1];
-          const varMatches = cssVars.matchAll(/--([^:]+):\s*([^;]+);/g);
+          // Use a more robust regex that handles whitespace and line breaks
+          const varPattern = /--([a-zA-Z0-9-]+)\s*:\s*([^;]+);/g;
+          let match;
           
-          for (const match of varMatches) {
+          while ((match = varPattern.exec(cssVars)) !== null) {
             const varName = `--${match[1].trim()}`;
             const varValue = match[2].trim();
-            variables[varName] = varValue;
+            // Validate hex color format
+            if (this.isValidHex(varValue)) {
+              variables[varName] = varValue;
+            }
           }
+        }
+
+        // Validate all required variables are present
+        const requiredVars = [
+          '--page-bg', '--header-bg', '--header-border', '--footer-bg', '--footer-text',
+          '--h1-color', '--h2-color', '--h3-color', '--body-text', '--muted-text', '--logo-color',
+          '--button-bg', '--button-text', '--link-color', '--accent-fill', '--border', '--ring',
+          '--bg', '--surface', '--text', '--text-muted', '--primary', '--primary-contrast'
+        ];
+        
+        const missingVars = requiredVars.filter(varName => !variables[varName]);
+        if (missingVars.length > 0) {
+          throw new Error(`Missing required variables: ${missingVars.join(', ')}`);
         }
 
         return {
@@ -859,7 +1303,7 @@ Generate CSS variables only. Ensure accessibility.`;
           createdAt: new Date().toISOString(),
           model: model,
           variables: variables,
-          cssText: cssText
+          cssText: cleanedCSS
         };
       }
 
@@ -878,9 +1322,8 @@ Generate CSS variables only. Ensure accessibility.`;
           return;
         }
         
-        this.themes.unshift(this.lastResponse);
-        this.saveThemes();
-        this.applyTheme(this.lastResponse.id);
+        const savedTheme = this.themeStore.addLocalTheme(this.lastResponse);
+        this.applyTheme(savedTheme.id);
         this.renderThemeHistory();
         this.showSuccess('Theme applied and saved!');
       }
@@ -1067,11 +1510,12 @@ Generate CSS variables only. Ensure accessibility.`;
       }
 
       applyPreviewedTheme() {
-        if (this.previewedTheme) {
-          this.themes.unshift(this.previewedTheme);
-          this.saveThemes();
-          this.applyTheme(this.previewedTheme.id);
-          this.renderThemeHistory();
+        const themeToApply = this.previewedTheme || 
+          (this.currentTheme && !this.themeStore.getThemeById(this.currentTheme.id) ? this.currentTheme : null);
+        
+        if (themeToApply) {
+          const savedTheme = this.themeStore.addLocalTheme(themeToApply);
+          this.applyTheme(savedTheme.id);
           this.showSuccess('Theme applied and saved!');
         }
       }
@@ -1083,8 +1527,9 @@ Generate CSS variables only. Ensure accessibility.`;
         // Show previewed theme if available, otherwise current theme
         const displayTheme = this.previewedTheme || this.currentTheme || this.getDefaultTheme();
         const isPreview = !!this.previewedTheme;
+        const isExternalTheme = displayTheme.id !== 'default' && !this.themeStore.getThemeById(displayTheme.id);
         
-        nameEl.textContent = `${isPreview ? 'Preview: ' : 'Current: '}${displayTheme.name}`;
+        nameEl.textContent = displayTheme.name;
         
         // Update color palette and CSS preview
         this.populateColorPalette(displayTheme.variables);
@@ -1095,9 +1540,9 @@ Generate CSS variables only. Ensure accessibility.`;
         const currentBtn = document.getElementById('widget-current');
         const applyBtn = document.getElementById('widget-apply');
         
-        currentBtn.style.display = isPreview ? 'block' : 'none';
-        applyBtn.textContent = isPreview ? 'Apply' : 'Applied';
-        applyBtn.disabled = !isPreview;
+        currentBtn.style.display = (isPreview || isExternalTheme) ? 'block' : 'none';
+        applyBtn.textContent = (isPreview || isExternalTheme) ? 'Apply' : 'Applied';
+        applyBtn.disabled = !(isPreview || isExternalTheme);
         
         widget.classList.add('show');
       }
@@ -1116,11 +1561,9 @@ Generate CSS variables only. Ensure accessibility.`;
 
       populateThemeDropdown() {
         const dropdown = document.getElementById('theme-dropdown');
-        const allThemes = [this.getDefaultTheme(), ...this.themes];
-        
         dropdown.innerHTML = '';
         
-        allThemes.forEach(theme => {
+        this.themes.forEach(theme => {
           const option = document.createElement('div');
           option.className = `theme-option ${theme.id === this.currentId ? 'active' : ''}`;
           
@@ -1140,11 +1583,11 @@ Generate CSS variables only. Ensure accessibility.`;
           nameDiv.className = 'theme-option-name';
           nameDiv.textContent = theme.name;
           
-          // Delete button (not for default theme)
+          // Delete button (only for local themes)
           const deleteBtn = document.createElement('button');
           deleteBtn.className = 'theme-option-delete';
           deleteBtn.textContent = '×';
-          deleteBtn.style.display = theme.id === 'default' ? 'none' : 'block';
+          deleteBtn.style.display = this.themeStore.canDelete(theme.id) ? 'block' : 'none';
           deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.deleteThemeFromDropdown(theme.id);
@@ -1168,13 +1611,18 @@ Generate CSS variables only. Ensure accessibility.`;
       }
 
       deleteThemeFromDropdown(themeId) {
+        if (!this.themeStore.canDelete(themeId)) {
+          this.showError('Cannot delete built-in themes');
+          return;
+        }
+        
         if (confirm('Delete this theme?')) {
-          this.themes = this.themes.filter(t => t.id !== themeId);
-          if (this.currentId === themeId) {
-            this.resetTheme();
+          if (this.themeStore.deleteTheme(themeId)) {
+            if (this.currentId === themeId) {
+              this.resetTheme();
+            }
+            this.updateFloatingWidget();
           }
-          this.saveThemes();
-          this.updateFloatingWidget();
         }
       }
 
@@ -1252,23 +1700,35 @@ Generate CSS variables only. Ensure accessibility.`;
         previewEl.appendChild(closeBrace);
       }
 
+      getRandomLoadingPhrase() {
+        const phrases = [
+          "Summoning color spirits...",
+          "Teaching pixels to be pretty...",
+          "Convincing AI that beige isn't a personality...",
+          "Extracting rainbow essence from the void...",
+          "Interrogating the color wheel...",
+          "Bribing photons to look better...",
+          "Calculating the optimal shade of awesome...",
+          "Downloading more RAM for your retina...",
+          "Converting caffeine to CSS variables...",
+          "Making colors that don't exist yet...",
+          "Asking the internet what looks good...",
+          "Stealing inspiration from butterflies...",
+          "Overthinking hexadecimal poetry...",
+          "Consulting the ancient scrolls of design..."
+        ];
+        return phrases[Math.floor(Math.random() * phrases.length)];
+      }
+
       showLoadingSpinner() {
-        const loadingArea = document.getElementById('loading-area');
-        const existingOverlay = loadingArea.querySelector('.loading-overlay');
-        
-        if (existingOverlay) return;
-        
-        const overlay = document.createElement('div');
-        overlay.className = 'loading-overlay';
-        overlay.innerHTML = '<div class="spinner"></div>';
-        loadingArea.appendChild(overlay);
+        const overlay = document.getElementById('panel-loading');
+        const textEl = document.getElementById('loading-text');
+        textEl.textContent = this.getRandomLoadingPhrase();
+        overlay.style.display = 'flex';
       }
 
       hideLoadingSpinner() {
-        const overlay = document.querySelector('.loading-overlay');
-        if (overlay) {
-          overlay.remove();
-        }
+        document.getElementById('panel-loading').style.display = 'none';
       }
 
       clearErrors() {
@@ -1280,6 +1740,104 @@ Generate CSS variables only. Ensure accessibility.`;
           e.preventDefault();
           this.suggestTheme();
         }
+      }
+
+      showCSSPopup() {
+        const displayTheme = this.previewedTheme || this.currentTheme || this.getDefaultTheme();
+        const popup = document.getElementById('css-popup');
+        const codeEl = document.getElementById('css-popup-code');
+        
+        this.populateCSSForPopup(displayTheme, codeEl);
+        popup.style.display = 'flex';
+      }
+
+      hideCSSPopup() {
+        document.getElementById('css-popup').style.display = 'none';
+      }
+
+      populateCSSForPopup(theme, container) {
+        container.innerHTML = '';
+        
+        // Add opening brace
+        const openBrace = document.createElement('div');
+        openBrace.textContent = ':root {';
+        container.appendChild(openBrace);
+        
+        // Add each variable with color box
+        Object.entries(theme.variables).forEach(([key, value]) => {
+          const line = document.createElement('div');
+          line.className = 'css-line';
+          
+          if (this.isValidHex(value)) {
+            const colorBox = document.createElement('div');
+            colorBox.className = 'css-color-box';
+            colorBox.style.backgroundColor = value;
+            line.appendChild(colorBox);
+          } else {
+            const spacer = document.createElement('div');
+            spacer.style.width = '12px';
+            spacer.style.marginRight = '0.5rem';
+            line.appendChild(spacer);
+          }
+          
+          const text = document.createElement('span');
+          text.textContent = `  ${key}: ${value};`;
+          line.appendChild(text);
+          
+          container.appendChild(line);
+        });
+        
+        // Add closing brace
+        const closeBrace = document.createElement('div');
+        closeBrace.textContent = '}';
+        container.appendChild(closeBrace);
+      }
+
+      checkURLTheme() {
+        const hash = window.location.hash.slice(1);
+        if (hash) {
+          try {
+            const themeData = JSON.parse(atob(hash));
+            if (themeData.variables) {
+              this.previewedTheme = {
+                ...themeData,
+                id: this.generateId()
+              };
+              this.applyVariables(themeData.variables);
+            }
+          } catch (e) {
+            console.warn('Invalid theme URL hash');
+          }
+        }
+      }
+
+      updateURLWithTheme(theme) {
+        const themeData = {
+          name: theme.name,
+          description: theme.description,
+          variables: theme.variables,
+          createdAt: theme.createdAt,
+          model: theme.model
+        };
+        const encoded = btoa(JSON.stringify(themeData));
+        window.history.replaceState(null, null, `#${encoded}`);
+      }
+
+      async copyThemeLink() {
+        const currentTheme = this.previewedTheme || this.currentTheme || this.getDefaultTheme();
+        this.updateURLWithTheme(currentTheme);
+        
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          this.showSuccess('Link copied to clipboard!');
+        } catch (err) {
+          this.showError('Failed to copy link');
+        }
+      }
+
+      handleHashChange() {
+        this.checkURLTheme();
+        this.updateFloatingWidget();
       }
     }
 
