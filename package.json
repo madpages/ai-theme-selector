@@ -1,0 +1,13 @@
+{
+  "name": "theme-screenshot-capture",
+  "version": "1.0.0",
+  "description": "Capture screenshots of different themes",
+  "main": "capture-screenshots.js",
+  "type": "module",
+  "scripts": {
+    "capture": "node capture-screenshots.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.11.0"
+  }
+}

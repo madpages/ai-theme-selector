@@ -1,27 +1,42 @@
-# Theme Lab - Minimalist Blog with AI-Powered Theme Generation
+# Theme Gallery - Rate Your Favorites 🎨
 
-A single-file HTML implementation of a minimalist blog article page with live Gemini-powered theme tuning.
+An interactive gallery for rating and comparing blog themes with auto-captured screenshots.
 
-## Features
+## ✨ Features
 
-- ✨ **Minimalist Design**: Clean, readable article layout using Spectral typography
-- 🎨 **CSS Variable System**: Complete theme system with semantic color tokens
-- 🤖 **AI Theme Generation**: Integration with Google Gemini API for intelligent theme suggestions
-- 💾 **Theme History**: Persistent storage of all generated themes in localStorage
-- 🔄 **Live Preview**: Instant theme application and preview without page reload
-- 📱 **Responsive Design**: Works on desktop and mobile devices
-- ♿ **Accessibility**: WCAG AA contrast compliance and keyboard navigation
+- **Theme Screenshots**: Auto-captured screenshots of 56 themes at 800px width
+- **Interactive Rating**: Rate themes 1-10 stars with keyboard or mouse
+- **Smart Navigation**: Auto-advance to next unrated theme after rating
+- **CSV Export**: Download your ratings as CSV for analysis
+- **Local Storage**: Ratings persist in browser storage
+- **Responsive Design**: Works on desktop and mobile
 
-## Getting Started
+## 🚀 GitHub Pages Deployment
 
-1. **Open the file**: Simply open `index.html` in any modern web browser
-2. **Get a Gemini API Key**: 
-   - Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Create a new API key
-   - Copy the key
-3. **Configure the API**: Click "Ask AI" and paste your API key in the configuration section
+1. Push this repository to GitHub
+2. Enable GitHub Pages in Settings → Pages → Source: GitHub Actions
+3. Your gallery will be live at: `https://yourusername.github.io/repository-name/`
 
-⚠️ **Important**: The current implementation exposes your API key in the browser and is intended for prototyping only. For production use, implement a backend proxy or use Firebase AI Logic.
+## 🎮 Controls
+
+- **←/→**: Navigate between themes
+- **1-9**: Rate theme 1-9 stars
+- **0**: Rate theme 10 stars
+- **Space**: Zoom image
+- **Esc**: Close zoom
+
+## 📁 Structure
+
+```
+docs/                   # GitHub Pages files
+├── index.html         # Theme gallery
+├── themes.json        # Theme data
+└── screenshots-optimized/ # Optimized theme screenshots
+```
+
+## Original Theme Lab
+
+The original AI-powered theme lab is available in `index.html`.
 
 ## How to Use
 
